@@ -7,9 +7,24 @@
 
 ## Requerimiento del sistema:  
 
-La empresa utiliza un sistema desarrollado en objetos para identificar que persona llevará ese paquete. De todos los requerimientos que tiene el sistema, en este ejercicio sólo se pide resolver el siguiente: **Determinar si ese _paquete_ puede ser entregado por una _persona_ en un determinado _destino_**, teniendo en cuenta las siguientes reglas.
+La empresa utiliza un sistema desarrollado en objetos para identificar que persona llevará ese paquete.
 
-### Reglas
+### Pagar el paquete
+El precio de un paquete depende del destino a dónde será entregado.
+- El paquete que se envía a **la matrix** vale 500 
+- El paquete que envía al **puente de brooklyn** vale 150 
+
+Se pide:
+- saber el precio del paquete
+- marcar que el paquete se ha pagado
+
+**Algunas pruebas**
+- preguntarle el precio al paquete, que contestará 500 o 150 según el destino a donde se envía
+- al inicio el paquete no está pago, luego de que se marca como pago ya sí lo está.
+
+### Saber si se puede entregar un paquete
+Determinar **si ese _paquete_ puede ser entregado por una _persona_ en un determinado _destino_**, teniendo en cuenta las siguientes reglas.
+
   - Para que el paquete pueda ser entregado debe estar pago. En el ejemplo mencionado está pago, pero no siempre es así. Puede variar. 
   - Cada destino le pone restricciones a las personas que quieren llegar a él. Existen dos destinos posibles:
     1. *Puente de Brooklyn*: deja pasar a todo lo que pese hasta una tonelada (1000 kilos).
@@ -22,8 +37,19 @@ La empresa utiliza un sistema desarrollado en objetos para identificar que perso
 
 **Aclaración:** Para el cálculo del peso, el peso del paquete es despreciable.
 
-## Algunos casos de prueba:
+### Algunos casos de prueba:
 1. El paquete de George que no está pago no puede ser llevado por Neo a la matrix.
 2. El paquete de George que sí está pago puede ser llevado por Jean a la matrix
 3. El paquete de George que sí está pago no puede ser llevado por Sara (que pesa 70kg) a Brooklyn si es que utiliza un camión con un acoplado .
 4. La entrega anterior puede hacerse si Sara usa una moto
+
+### Para pensar:
+- Cuales son los polimorfismos?
+  - definir Tipo de los objetos polimórficos
+  - mensajes de los tipos de los obejtos polimorficos
+  - quienes usan los mensajes polimórficos
+    
+- Dibujar un diagrama estático en que se vea la relación entre los objetos y los tipos polimórficos
+- Mencionar un mensaje que sea una orden y otro que sea una consulta
+- En tu solución, el mensajero es un atributo del paquete o no? Por qué? Pensar como sería la manera alternativa.
+- Revisá que no haya quedado precálculo en el peso de Sara
