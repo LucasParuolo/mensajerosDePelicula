@@ -1,0 +1,83 @@
+import paqueteria.*
+
+describe "Mensajeros de Pelicula" {
+  test "PruebaPaquete1" {
+    //preguntarle el precio 
+    //al paquete, que contestará 
+    //500 o 150 según el destino 
+    //a donde se envía
+    paquete.destino(brooklyn)
+    paquete.pagado(true)
+    paquete.mensajero(neo)
+    
+    assert.equals(150, paquete.precioDestino())
+  }
+
+  test "PruebaPaquete2" {
+    //al inicio el paquete no está 
+    //pago, luego de que se marca 
+    //como pago ya sí lo está.
+    paquete.destino(brooklyn)
+    paquete.pagado(false)
+    paquete.mensajero(neo)
+    
+    assert.equals(false, paquete.pagado())
+    paquete.pagar()
+    assert.equals(true, paquete.pagado())
+  }
+
+  test "PruebaMensajeria1" {
+    //El paquete de George que 
+    //no está pago no puede ser 
+    //llevado por Neo a la matrix.
+    paquete.destino(matrix)
+    paquete.mensajero(neo)
+    
+    assert.equals(false, paquete.entrega())
+  }
+
+  test "PruebaMensajeria2" {
+    //El paquete de George 
+    //que sí está pago puede ser 
+    //llevado por Jean a la matrix
+    paquete.destino(matrix)
+    paquete.mensajero(jeanGray)
+    paquete.pagado(true)
+    
+    assert.equals(true, paquete.entrega())
+  }
+
+
+  test "PruebaMensajeria3" {
+    //El paquete de George que 
+    //sí está pago no puede ser 
+    //llevado por Sara (que pesa 70kg
+    //a Brooklyn si es que utiliza un 
+    //camión con un acoplado.
+
+    paquete.destino(brooklyn)
+    paquete.mensajero(saraConnor)
+    paquete.pagado(true)
+    saraConnor.vehiculo(camion)
+    saraConnor.pesoS(70)
+    camion.acoprados(1)
+    
+    assert.equals(false, paquete.entrega())
+  }
+
+  test "PruebaMensajeria4" {
+    //La entrega anterior puede
+    //hacerse si Sara usa una moto
+
+    paquete.destino(brooklyn)
+    paquete.mensajero(saraConnor)
+    paquete.pagado(true)
+    saraConnor.vehiculo(moto)
+    saraConnor.pesoS(70)
+    
+    assert.equals(true, paquete.entrega())
+  }
+
+
+}
+
