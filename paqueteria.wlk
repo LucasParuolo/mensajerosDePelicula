@@ -1,20 +1,19 @@
 /** First Wollok example */
 object paquete {
-	var property destino = "matrix"
 	var property pagado = false
-	var property mensajero = "jeanGray"
 
 	method pagar() {
 		pagado = true
 	}
 
-	method precioDestino(){
-		return destino.precio()
+	method precioDestino(destinoaPaquete){
+		return destinoaPaquete.precio()
 	}
 
-	method entrega() {
-	  return pagado and destino.condicionEntrada(mensajero)
+	method puedeSerEntregadoPor_En_(mensajeroDelPaquete, destinoaPaquete) {
+	  return pagado and destinoaPaquete.condicionEntrada(mensajeroDelPaquete)
 	}
+
 }
 
 object matrix {
@@ -60,8 +59,8 @@ object neo {
 }
 
 object saraConnor {
-	var property vehiculo = "moto"
-	var property pesoS = 0 
+	var property vehiculo = moto
+	var property pesoActualDeSara = 0 
 	
 
 	method puedeLlamar() {
@@ -69,19 +68,19 @@ object saraConnor {
 	}
 
   	method peso(){
-		return vehiculo.pesoVehiculo(pesoS)
+		return pesoActualDeSara + vehiculo.pesoVehiculo()
   	}
 }
 
 object moto {
-  method pesoVehiculo(pesoUsuario) {
-	return pesoUsuario + 100
+  method pesoVehiculo() {
+	return 100
   }
 }
 
 object camion {
 	var property acoprados = 0 
-  method pesoVehiculo(pesoUsuario) {
-	return pesoUsuario + (500 + (500 * acoprados))
+  method pesoVehiculo() {
+	return (500 + (500 * acoprados))
   }
 }

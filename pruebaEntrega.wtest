@@ -6,20 +6,16 @@ describe "Mensajeros de Pelicula" {
     //al paquete, que contestará 
     //500 o 150 según el destino 
     //a donde se envía
-    paquete.destino(brooklyn)
     paquete.pagado(true)
-    paquete.mensajero(neo)
     
-    assert.equals(150, paquete.precioDestino())
+    assert.equals(150, paquete.precioDestino(brooklyn))
   }
 
   test "PruebaPaquete2" {
     //al inicio el paquete no está 
     //pago, luego de que se marca 
     //como pago ya sí lo está.
-    paquete.destino(brooklyn)
     paquete.pagado(false)
-    paquete.mensajero(neo)
     
     assert.equals(false, paquete.pagado())
     paquete.pagar()
@@ -30,21 +26,17 @@ describe "Mensajeros de Pelicula" {
     //El paquete de George que 
     //no está pago no puede ser 
     //llevado por Neo a la matrix.
-    paquete.destino(matrix)
-    paquete.mensajero(neo)
     
-    assert.equals(false, paquete.entrega())
+    assert.equals(false, paquete.puedeSerEntregadoPor_En_(neo, matrix))
   }
 
   test "PruebaMensajeria2" {
     //El paquete de George 
     //que sí está pago puede ser 
     //llevado por Jean a la matrix
-    paquete.destino(matrix)
-    paquete.mensajero(jeanGray)
     paquete.pagado(true)
     
-    assert.equals(true, paquete.entrega())
+    assert.equals(true, paquete.puedeSerEntregadoPor_En_(jeanGray,matrix))
   }
 
 
@@ -55,27 +47,23 @@ describe "Mensajeros de Pelicula" {
     //a Brooklyn si es que utiliza un 
     //camión con un acoplado.
 
-    paquete.destino(brooklyn)
-    paquete.mensajero(saraConnor)
     paquete.pagado(true)
     saraConnor.vehiculo(camion)
-    saraConnor.pesoS(70)
+    saraConnor.pesoActualDeSara(70)
     camion.acoprados(1)
     
-    assert.equals(false, paquete.entrega())
+    assert.equals(false, paquete.puedeSerEntregadoPor_En_(saraConnor, brooklyn))
   }
 
   test "PruebaMensajeria4" {
     //La entrega anterior puede
     //hacerse si Sara usa una moto
 
-    paquete.destino(brooklyn)
-    paquete.mensajero(saraConnor)
     paquete.pagado(true)
     saraConnor.vehiculo(moto)
-    saraConnor.pesoS(70)
+    saraConnor.pesoActualDeSara(70)
     
-    assert.equals(true, paquete.entrega())
+    assert.equals(true, paquete.puedeSerEntregadoPor_En_(saraConnor, brooklyn))
   }
 
 
