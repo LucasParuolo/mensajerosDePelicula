@@ -18,7 +18,7 @@ describe "Mensajeros de Pelicula" {
     paquete.pagado(false)
     
     assert.equals(false, paquete.pagado())
-    paquete.pagar()
+    paquete.pagar(50)
     assert.equals(true, paquete.pagado())
   }
 
@@ -69,3 +69,128 @@ describe "Mensajeros de Pelicula" {
 
 }
 
+describe "Mensajeros De Peliculas2: Electric Boogalo" {
+  test "pruebaEmpresa1" {
+    //Contratar a Neo a la empresa, corroborar que
+    //Neo forme parte de la empresa
+    empresa.contratarMensajero(neo)
+
+    assert.that(empresa.tieneEmpleado(neo))
+  }
+
+  test "pruebaEmpresa2" {
+    //Despide a Neo a la empresa, corroborar que
+    //Neo ya no forme parte de la empresa
+    empresa.contratarMensajero(neo)
+    empresa.despedirMensajero(neo)
+
+    assert.notThat(empresa.tieneEmpleado(neo))
+  }
+
+  test "pruebaEmpresa3" {
+    //Hubo un recorte de personal en la empresa, 
+    //corroborar que TODOS los mensajeros fueron despedidos
+    empresa.mensajeros([neo, saraConnor])
+    empresa.despedirTodosLosMensajeros()
+
+    assert.notThat(empresa.empresaGrande())
+  }
+
+  test "pruebaEmpresa4" {
+    //Aparte de Neo se contrato a Sara Connor por
+    //tener transporte. Averiguar si la empresa puede
+    //ser considerada grande a este punto.
+
+    empresa.contratarMensajero(neo)
+    empresa.contratarMensajero(saraConnor)
+    empresa.contratarMensajero(jeanGray)
+
+    assert.that(empresa.empresaGrande())
+  }
+
+  test "pruebaEmpresa5" {
+    //Llego un nuevo paquete a la empresa que debe ser
+    //entregado en la brevedad a la matrix.
+    //Averigua si Neo puede entregarlo a tiempo.
+
+    paquete.pagado(true)
+    empresa.mensajeros([neo, saraConnor])
+
+    assert.that(empresa.primerMensajeroDisponible(matrix))
+  }
+
+  test "pruebaEmpresa6" {
+    //Estamos haciendo un control sobre el peso del
+    //anterior paquete para medir mejor nuestros transportes
+    //a Brookyln. Averiguar el peso de nuestro ultimo
+    //mensajero, en este caso Sara con su moto que
+    //deberia devolver 100.
+
+    empresa.mensajeros([neo, saraConnor])
+
+    assert.equals(100, empresa.pesoDelUltimoMensajero())
+  }
+}
+
+describe "Mensajeria Recargada (3)" {
+  test "pruebaEntrega1" {
+    //Averiguar si un paquete cualquiera puede ser
+    //entregado por la empresa. Es decir, si al menos
+    //1 mensajero puede entregarla.
+
+    paquete.pagar(50)
+    neo.credito(false)
+    empresa.contratarMensajero(neo)
+    empresa.contratarMensajero(saraConnor)
+    empresa.contratarMensajero(jeanGray)
+
+    assert.that(empresa.elPrimeroQuePuedaEntregar(paquete, matrix))
+  }
+
+  test "pruebaEntrega2" {
+    //La empresa busca averiguar que mensajeros
+    //pueden entregar un paquete. Averiguando quienes pueden
+    //enviarlo a la matrix.
+
+    paquete.pagar(50)
+    neo.credito(true)
+    empresa.contratarMensajero(neo)
+    empresa.contratarMensajero(saraConnor)
+    empresa.contratarMensajero(jeanGray)
+
+    assert.equals([neo, jeanGray], empresa.losQuePuedenEnviar(paquete, matrix))
+  }
+
+  test "pruebaPeso"{
+    //Averiguar si la empresa tiene un problema de sobrepeso
+    //superando los 500kg en el promedio de sus empleados.
+    //Para esto, Sara Connor trajo su camion.
+
+    saraConnor.vehiculo(camion)
+    camion.acoprados(3)
+    empresa.contratarMensajero(neo)
+    empresa.contratarMensajero(saraConnor)
+    empresa.contratarMensajero(jeanGray)
+
+    assert.that(empresa.sobrepesoMensajeria())
+  }
+
+  test "Envio1"{
+    //Averiguar si la empresa puede enviar un paquete
+    //de manera efectiva. Viendo si hay algun miembro
+    //de los mensajeros capacitado o sino enviandolo a
+    //pendientes.
+
+    paquete.pagar(50)
+    neo.credito(false)
+    empresa.contratarMensajero(neo)
+    empresa.contratarMensajero(saraConnor)
+    empresa.enviar(paquete, brooklyn)
+
+    assert.equals([], empresa.paquetesPendientes)
+
+    empresa.enviar(paquete, matrix)
+
+    assert.equals(1, empresa.paquetesPendientes.length)
+  }
+}
