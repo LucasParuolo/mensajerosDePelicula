@@ -125,12 +125,12 @@ describe "Mensajeros De Peliculas2: Electric Boogalo" {
     //Llego un nuevo paquete a la empresa que debe ser
     //entregado en la brevedad a la matrix.
     //Averigua si Neo puede entregarlo a tiempo.
-    const paquete = new Paquete()
+    const paquete = new Paquete(destino = matrix)
 
     paquete.pagado(true)
     empresa.mensajeros([neo, saraConnor])
 
-    assert.that(empresa.primerMensajeroDisponible(matrix))
+    assert.that(empresa.primerMensajeroDisponible(paquete))
   }
 
   test "pruebaEmpresa6" {

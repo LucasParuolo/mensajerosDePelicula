@@ -25,8 +25,8 @@ object empresa{
 		return mensajeros.size() >= 2
 	}
 
-	method primerMensajeroDisponible(destinoAsignado){
-		return Paquete.puedeSerEntregadoPor_(mensajeros.first())
+	method primerMensajeroDisponible(paqueteAEnviar){
+		return paqueteAEnviar.puedeSerEntregadoPor_(mensajeros.first())
 	}
 
 	method pesoDelUltimoMensajero() {
@@ -49,7 +49,7 @@ object empresa{
 	}
 	//un mensajero o excepcion
 	method elPrimeroQuePuedaEntregar(paqueteAEntregar) {
-	  return mensajeros.find({mensajero => paqueteAEntregar.puedeSerEntregadoPor_(mensajero)})
+	  return mensajeros.any({mensajero => paqueteAEntregar.puedeSerEntregadoPor_(mensajero)})
 	}
 
 	method todosPuedenEnviar(paqueteAEntregar){
