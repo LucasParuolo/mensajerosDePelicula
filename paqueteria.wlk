@@ -26,7 +26,7 @@ object empresa{
 	}
 
 	method primerMensajeroDisponible(destinoAsignado){
-		return paquete.puedeSerEntregadoPor_En_(mensajeros.first(), destinoAsignado)
+		return Paquete.puedeSerEntregadoPor_(mensajeros.first())
 	}
 
 	method pesoDelUltimoMensajero() {
@@ -40,20 +40,20 @@ object empresa{
 	}
 
 	//lista de mensajeros
-	method losQuePuedenEnviar(paqueteAEntregar, lugarAEntregar) {
-	  return mensajeros.filter({mensajero => paqueteAEntregar.puedeSerEntregadoPor_En_(mensajero, lugarAEntregar)})
+	method losQuePuedenEnviar(paqueteAEntregar) {
+	  return mensajeros.filter({mensajero => paqueteAEntregar.puedeSerEntregadoPor_(mensajero)})
 	}
 	//true o false
-	method hayAlgunMensajeroQuePuedeEntregar(paqueteAEntregar, lugarAEntregar) {
-	  return mensajeros.any({mensajero => paqueteAEntregar.puedeSerEntregadoPor_En_(mensajero, lugarAEntregar)})
+	method hayAlgunMensajeroQuePuedeEntregar(paqueteAEntregar) {
+	  return mensajeros.any({mensajero => paqueteAEntregar.puedeSerEntregadoPor_(mensajero)})
 	}
 	//un mensajero o excepcion
-	method elPrimeroQuePuedaEntregar(paqueteAEntregar, lugarAEntregar) {
-	  return mensajeros.find({mensajero => paqueteAEntregar.puedeSerEntregadoPor_En_(mensajero, lugarAEntregar)})
+	method elPrimeroQuePuedaEntregar(paqueteAEntregar) {
+	  return mensajeros.find({mensajero => paqueteAEntregar.puedeSerEntregadoPor_(mensajero)})
 	}
 
-	method todosPuedenEnviar(paqueteAEntregar, lugarAEntregar){
-		return mensajeros.all({mensajero => paqueteAEntregar.puedeSerEntregadoPor_En_(mensajero, lugarAEntregar)})
+	method todosPuedenEnviar(paqueteAEntregar){
+		return mensajeros.all({mensajero => paqueteAEntregar.puedeSerEntregadoPor_(mensajero)})
 	}
 
 	method algunMensajeroTieneSobrepeso() {
@@ -62,106 +62,162 @@ object empresa{
 
 
 
-	method enviar(paqueteAEnviar, destinoAEntregar){
-		if (self.hayAlgunMensajeroQuePuedeEntregar(paqueteAEnviar, destinoAEntregar)){
+	method enviar(paqueteAEnviar){
+		if (self.hayAlgunMensajeroQuePuedeEntregar(paqueteAEnviar)){
 			paquetesEnviados.add(paqueteAEnviar)
 			paquetesPendientes.remove(paqueteAEnviar)
-			facturacion += paqueteAEnviar.precio()
+			facturacion += paqueteAEnviar.precioOriginal()
 
 		}else{
 			paquetesPendientes.add(paqueteAEnviar)
-			self.error("No se cumplen las condiciones de envio")
 		}
 	}
 
 	//TODO: Hacer lista de paquetesPendientes
 	method elMasCaro(){
-		return paquetesPendientes.max({paquete => paquete.precio()})
+		return paquetesPendientes.max({paquete => paquete.precioOriginal()})
 	}
 
 	method facturacionActual() {
-	  return paquetesEnviados.forEach({paquete => facturacion =+ paquete.precio()})
+	  return facturacion
+	}
+
+	method cantidadPaquetesPendientes() {
+	  return paquetesPendientes.size()
+	}
+
+	method cantidadPaquetesEnviados() {
+	  return paquetesEnviados.size()
 	}
 
 	//TODO: Añadir methodo enviar
-	method enviarTodos(coleccionDePaquetes, destinoAEntregar) {
-	  coleccionDePaquetes.forEach({paquete => self.enviar(paquete, destinoAEntregar)})
+	method enviarTodos(coleccionDePaquetes) {
+	  coleccionDePaquetes.forEach({paquete => self.enviar(paquete)})
 	}
 
-	method enviarMasCaroA_(destinoAEntregar){
+	method enviarMasCaro(){
 		
-		self.enviar(self.elMasCaro(), destinoAEntregar)
+		self.enviar(self.elMasCaro())
 	}
 }
 
 
 
-object paquetonViajero {
+class PaquetonViajero {
 	var property pagado = false
-	var property precio = 0
+	var property creditosAbonados = 0
+	const property destinos = []
 
-	method pagar(creditosPagados) {
-		if(creditosPagados >= precio){
-			precio = 0
-			pagado = true
-		}
-		else{
-			precio = precio - creditosPagados
-		}
-
+	method precioBase() {
+		return destinos.size() * 100
 	}
 
-	method precioTotal(listaDeDestinoaPaquete){
-		listaDeDestinoaPaquete.forEach({paquete => precio += 100})
+	method precio(){
+		return (self.precioBase() - creditosAbonados).max(0)
+	}
+
+	method precioOriginal() {
+		return self.precioBase()
+	}
+
+	method pagar(creditosPagados) {
+		creditosAbonados += creditosPagados
+		if (self.precio() == 0){
+			pagado = true
+		}
+
 	}
 
 	method precioDestino(destinoaPaquete){
 		return destinoaPaquete.precio()
 	}
 
-	method puedeSerEntregadoPor_En_(mensajeroDelPaquete, listaDeDestinoaPaquete) {
-	  return pagado and listaDeDestinoaPaquete.forEach({destino => destino.condicionEntrada(mensajeroDelPaquete)})
+	method puedeSerEntregadoPor_(mensajeroDelPaquete) {
+	  return pagado and destinos.all({destino => destino.condicionEntrada(mensajeroDelPaquete)})
 	}
 
 }
 
-object paquetito {
+class Paquetito {
 	var property pagado = true
-	var property precio = 0
+	var property precioBase = 0
+	var property creditosAbonados = 0
+	var property destino = ""
 
-
-	method precioDestino(destinoaPaquete){
-		return destinoaPaquete.precio()
+	method precioOriginal() {
+		return precioBase
 	}
 
-	method puedeSerEntregadoPor_En_(mensajeroDelPaquete, destinoaPaquete) {
-	  return destinoaPaquete.condicionEntrada(mensajeroDelPaquete)
+	method precioDestino(){
+		return destino.precio()
+	}
+
+	method puedeSerEntregadoPor_(mensajeroDelPaquete) {
+	  return destino.condicionEntrada(mensajeroDelPaquete)
 	}
 
 }
 
-object paquete {
+class Paquete {
 	var property pagado = false
-	var property precio = 50
+	var property precioBase = 50
+	var property creditosAbonados = 0
+	var property destino = ""
 
+	method precio(){
+		return (precioBase - creditosAbonados).max(0)
+	}
+
+	method precioOriginal() {
+		return precioBase
+	}
 
 	method pagar(creditosPagados) {
-		if(creditosPagados >= precio){
-			precio = 0
+		creditosAbonados += creditosPagados
+		if (self.precio() == 0){
 			pagado = true
 		}
-		else{
-			precio = precio - creditosPagados
+
+	}
+
+	method precioDestino(){
+		return destino.precio()
+	}
+
+	method puedeSerEntregadoPor_(mensajeroDelPaquete) {
+	  return pagado and destino.condicionEntrada(mensajeroDelPaquete)
+	}
+
+}
+
+class PaqueteFragil {
+	var property pagado = false
+	var property precioBase = 75
+	var property creditosAbonados = 0
+	var property destino = ""
+
+	method precio(){
+		return (precioBase - creditosAbonados).max(0)
+	}
+
+	method precioOriginal() {
+		return precioBase
+	}
+
+	method pagar(creditosPagados) {
+		creditosAbonados += creditosPagados
+		if (self.precio() == 0){
+			pagado = true
 		}
 
 	}
 
-	method precioDestino(destinoaPaquete){
-		return destinoaPaquete.precio()
+	method precioDestino(){
+		return destino.precio()
 	}
 
-	method puedeSerEntregadoPor_En_(mensajeroDelPaquete, destinoaPaquete) {
-	  return pagado and destinoaPaquete.condicionEntrada(mensajeroDelPaquete)
+	method puedeSerEntregadoPor_(mensajeroDelPaquete) {
+	  return pagado and (mensajeroDelPaquete.peso() < 100) and destino.condicionEntrada(mensajeroDelPaquete)
 	}
 
 }
@@ -187,6 +243,16 @@ object brooklyn  {
 }
 
 object jeanGray {
+	method puedeLlamar() {
+	  return true
+	}
+
+  	method peso(){
+		return 65
+  	}
+}
+
+object t900 {
 	method puedeLlamar() {
 	  return true
 	}

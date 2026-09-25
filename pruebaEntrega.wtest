@@ -6,15 +6,19 @@ describe "Mensajeros de Pelicula" {
     //al paquete, que contestará 
     //500 o 150 según el destino 
     //a donde se envía
+    const paquete = new Paquete()
+
     paquete.pagado(true)
+    paquete.destino(brooklyn)
     
-    assert.equals(150, paquete.precioDestino(brooklyn))
+    assert.equals(150, paquete.precioDestino())
   }
 
   test "PruebaPaquete2" {
     //al inicio el paquete no está 
     //pago, luego de que se marca 
     //como pago ya sí lo está.
+    const paquete = new Paquete()
     paquete.pagado(false)
     
     assert.equals(false, paquete.pagado())
@@ -26,17 +30,22 @@ describe "Mensajeros de Pelicula" {
     //El paquete de George que 
     //no está pago no puede ser 
     //llevado por Neo a la matrix.
-    
-    assert.equals(false, paquete.puedeSerEntregadoPor_En_(neo, matrix))
+    const paquete = new Paquete()
+    paquete.destino(matrix)
+
+    assert.equals(false, paquete.puedeSerEntregadoPor_(neo))
   }
 
   test "PruebaMensajeria2" {
     //El paquete de George 
     //que sí está pago puede ser 
     //llevado por Jean a la matrix
-    paquete.pagado(true)
+    const paquete = new Paquete()
     
-    assert.equals(true, paquete.puedeSerEntregadoPor_En_(jeanGray,matrix))
+    paquete.pagado(true)
+    paquete.destino(matrix)
+    
+    assert.equals(true, paquete.puedeSerEntregadoPor_(jeanGray))
   }
 
 
@@ -46,24 +55,28 @@ describe "Mensajeros de Pelicula" {
     //llevado por Sara (que pesa 70kg
     //a Brooklyn si es que utiliza un 
     //camión con un acoplado.
+    const paquete = new Paquete()    
 
     paquete.pagado(true)
+    paquete.destino(brooklyn)
     saraConnor.vehiculo(camion)
     saraConnor.pesoActualDeSara(70)
     camion.acoprados(1)
     
-    assert.equals(false, paquete.puedeSerEntregadoPor_En_(saraConnor, brooklyn))
+    assert.equals(false, paquete.puedeSerEntregadoPor_(saraConnor))
   }
 
   test "PruebaMensajeria4" {
     //La entrega anterior puede
     //hacerse si Sara usa una moto
+    const paquete = new Paquete()  
 
     paquete.pagado(true)
+    paquete.destino(brooklyn)
     saraConnor.vehiculo(moto)
     saraConnor.pesoActualDeSara(70)
     
-    assert.equals(true, paquete.puedeSerEntregadoPor_En_(saraConnor, brooklyn))
+    assert.equals(true, paquete.puedeSerEntregadoPor_(saraConnor))
   }
 
 
@@ -112,6 +125,7 @@ describe "Mensajeros De Peliculas2: Electric Boogalo" {
     //Llego un nuevo paquete a la empresa que debe ser
     //entregado en la brevedad a la matrix.
     //Averigua si Neo puede entregarlo a tiempo.
+    const paquete = new Paquete()
 
     paquete.pagado(true)
     empresa.mensajeros([neo, saraConnor])
@@ -137,28 +151,32 @@ describe "Mensajeria Recargada (3)" {
     //Averiguar si un paquete cualquiera puede ser
     //entregado por la empresa. Es decir, si al menos
     //1 mensajero puede entregarla.
+    const paquete = new Paquete()
 
     paquete.pagar(50)
+    paquete.destino(matrix)
     neo.credito(false)
     empresa.contratarMensajero(neo)
     empresa.contratarMensajero(saraConnor)
     empresa.contratarMensajero(jeanGray)
 
-    assert.that(empresa.elPrimeroQuePuedaEntregar(paquete, matrix))
+    assert.that(empresa.elPrimeroQuePuedaEntregar(paquete))
   }
 
   test "pruebaEntrega2" {
     //La empresa busca averiguar que mensajeros
     //pueden entregar un paquete. Averiguando quienes pueden
     //enviarlo a la matrix.
+    const paquete = new Paquete()
 
     paquete.pagar(50)
+    paquete.destino(matrix)
     neo.credito(true)
     empresa.contratarMensajero(neo)
     empresa.contratarMensajero(saraConnor)
     empresa.contratarMensajero(jeanGray)
 
-    assert.equals([neo, jeanGray], empresa.losQuePuedenEnviar(paquete, matrix))
+    assert.equals([neo, jeanGray], empresa.losQuePuedenEnviar(paquete))
   }
 
   test "pruebaPeso"{
@@ -180,17 +198,150 @@ describe "Mensajeria Recargada (3)" {
     //de manera efectiva. Viendo si hay algun miembro
     //de los mensajeros capacitado o sino enviandolo a
     //pendientes.
+    const paquete = new Paquete()
+
 
     paquete.pagar(50)
+    paquete.destino(brooklyn)
     neo.credito(false)
     empresa.contratarMensajero(neo)
     empresa.contratarMensajero(saraConnor)
-    empresa.enviar(paquete, brooklyn)
+    
+    empresa.enviar(paquete)
 
-    assert.equals([], empresa.paquetesPendientes)
+    assert.equals(0, empresa.cantidadPaquetesPendientes())
 
-    empresa.enviar(paquete, matrix)
+    paquete.destino(matrix)
+    empresa.enviar(paquete)
 
-    assert.equals(1, empresa.paquetesPendientes.length)
+    assert.equals(1, empresa.cantidadPaquetesPendientes())
+  }
+
+  test "facturacion"{
+    //Queremos averiguar la facturacion de la empresa
+    //tras una serie vario pinta de pedidos que involucran
+    //2 paquetes, un paquetito y 1 paquete viajero a 2 destinos
+
+    const paquete1 = new Paquete()
+    const paquete2 = new Paquete()
+    const paquetito1 = new Paquetito()
+    const paquetote = new PaquetonViajero(destinos = [brooklyn, matrix])
+
+    paquete1.pagar(50)
+    paquete1.destino(matrix)
+    paquete2.destino(brooklyn)
+    paquetito1.destino(brooklyn)
+    empresa.contratarMensajero(neo)
+    empresa.contratarMensajero(saraConnor)
+    saraConnor.vehiculo(moto)
+    empresa.contratarMensajero(jeanGray) 
+
+    empresa.enviar(paquete1)
+
+    paquete2.pagar(50)
+
+    empresa.enviar(paquete2)
+
+    assert.equals(100, empresa.facturacionActual())
+
+    empresa.enviar(paquetito1)
+    paquetote.pagar(200)
+    empresa.enviar(paquetote)
+
+    assert.equals(300, empresa.facturacionActual())
+  }
+
+  test "envioMasivo"{
+    //La empresa recibio un total de 5 paquetes, 2 paquetitos y 1 viajero
+    //Tenemos que enviarlos a todos PRONTO
+    const paquete1 = new Paquete(destino = matrix)
+    const paquete2 = new Paquete(destino = brooklyn)
+    const paquetito1 = new Paquetito(destino = brooklyn)
+    const paquetito2 = new Paquetito(destino = matrix)
+    const paqueton = new PaquetonViajero(destinos = [brooklyn, matrix])
+
+    empresa.contratarMensajero(neo)
+    empresa.contratarMensajero(saraConnor)
+    saraConnor.vehiculo(camion)
+    camion.acoprados(1)
+    empresa.contratarMensajero(jeanGray)
+    paquete1.pagar(50)
+    paquete2.pagar(50)
+    paqueton.pagar(200)
+
+    empresa.enviarTodos([paquete1, paquete2, paquetito1, paquetito2, paqueton])
+
+    assert.equals(5, empresa.cantidadPaquetesEnviados())
+  }
+
+  test "envioPremium"{
+    //La empresa recibio una lista de 3 paquetes, uno de ellos 1 viajero
+    //Este ultimo es extraorbitantemente caro y debido a esto y al los tiempos
+    //de viaje debe ser llevado a su destino final cuanto antes
+    const paquete1 = new Paquete(destino = matrix)
+    const paquete2 = new Paquete(destino = brooklyn)
+    const paqueton = new PaquetonViajero(destinos = [brooklyn, matrix, brooklyn, brooklyn])
+
+    empresa.contratarMensajero(neo)
+    empresa.contratarMensajero(saraConnor)
+    saraConnor.vehiculo(camion)
+    camion.acoprados(1)
+    empresa.contratarMensajero(jeanGray)
+
+    empresa.enviarTodos([paquete1, paquete2, paqueton])
+
+    paquete1.pagar(50)
+    paquete2.pagar(50)
+    paqueton.pagar(400)
+
+    empresa.enviarMasCaro()
+
+    assert.equals(2, empresa.paquetesPendientes().size())
+
+    assert.that(empresa.paquetesPendientes().contains(paquete1))
+    assert.that(empresa.paquetesPendientes().contains(paquete2))
+  }
+
+  test "envioDelicado" {
+    //Hemos recibido un pedido muy delicado y la empresa quiere asegurarse que
+    //Al menos uno de sus mensajeros es capaz de transportarlo
+    //De manera segura a su destino sin romperlo
+
+    const paquete = new PaqueteFragil(destino = brooklyn)
+
+    empresa.contratarMensajero(neo)
+    empresa.contratarMensajero(saraConnor)
+    saraConnor.vehiculo(camion)
+    camion.acoprados(1)
+    empresa.contratarMensajero(jeanGray)
+
+    paquete.pagar(75)
+
+    assert.that(empresa.hayAlgunMensajeroQuePuedeEntregar(paquete))
+  }
+  
+  test "nuevoEmpleado" {
+    //La mensajera Sara Connor fue atacada por un androide T-900 durante un envio
+    //Logro neutralizarlo y al encontrarse en (relativas) buenas condiciones
+    //La compañia decidio reprogramarlo y utilizarlo para realizar envios
+    //al ser una maquina tiene conexion con la red, pudiendo entrar en la matrix cuando quiera
+    //y es incansable pudiendo ir el solo  a pie hasta con paquetes pesados
+    //En cambio tememos que por su peso (y falta de cuidado en general)
+    //puede presentar problemas en la entrega de paquetes fragiles
+    //asi que buscamos confirmar que funcione para paquetes comunes
+    //y si tiene problemas con un paquete fragil
+
+    const paqueteComun = new Paquete(destino = brooklyn)
+    const paqueteDigital = new Paquete(destino = matrix)
+    const paqueteDelicado = new PaqueteFragil(destino = brooklyn)
+    empresa.contratarMensajero(t900)
+
+    paqueteComun.pagar(50)
+    paqueteDigital.pagar(50)
+    paqueteDelicado.pagar(75)
+
+    assert.that(paqueteComun.puedeSerEntregadoPor_(t900))
+    assert.that(paqueteDigital.puedeSerEntregadoPor_(t900))
+    assert.that(paqueteDelicado.puedeSerEntregadoPor_(t900))
   }
 }
